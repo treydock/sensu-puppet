@@ -252,6 +252,20 @@ describe 'sensu::backend', :type => :class do
            is_expected.to compile.and_raise_error(/Do not define both license_source and license_content/)
         end
       end
+
+      context 'checks defined' do
+        let(:params) {{
+          :checks => {
+            'test' => {
+              'command' => 'foobar',
+              'subscriptions' => ['demo'],
+              'handlers' => ['slack'],
+              'interval' => 60,
+            }
+          }
+        }}
+        it { should contain_sensu_check('test') }
+      end
     end
   end
 end

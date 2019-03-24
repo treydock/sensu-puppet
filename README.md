@@ -16,6 +16,7 @@
     * [Installing Plugins](#installing-plugins)
     * [Installing Extensions](#installing-extensions)
     * [Exported resources](#exported-resources)
+    * [Hiera resources](#hiera-resources)
     * [Resource purging](#resource-purging)
     * [Sensu backend cluster](#sensu-backend-cluster)
         * [Adding backend members to an existing cluster](#adding-backend-members-to-an-existing-cluster)
@@ -306,6 +307,22 @@ The backend system would collect all `sensu_check` resources.
 
 ```puppet
   Sensu_check <<||>>
+```
+
+### Hiera resources
+
+All the types provided by this module can have their resources defined via Hiera. A type such as `sensu_check` would be defined via `sensu::backend::checks`.
+
+The following example adds a check via Hiera:
+
+```yaml
+sensu::backend::checks:
+  check-cpu:
+    ensure: present
+    command: check-cpu.sh -w 75 -c 90
+    interval: 60
+    subscriptions:
+      - linux
 ```
 
 ### Resource purging
