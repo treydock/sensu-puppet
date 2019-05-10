@@ -2,6 +2,9 @@ require 'spec_helper'
 
 describe 'sensu::repo', :type => :class do
   on_supported_os({facterversion: '3.8.0'}).each do |os, facts|
+    if facts[:os]['family'] == 'windows'
+      next
+    end
     context "on #{os}" do
       let(:facts) { facts }
       case os

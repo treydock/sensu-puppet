@@ -10,6 +10,7 @@
 3. [Usage - Configuration options and additional functionality](#usage)
     * [Basic Sensu backend](#basic-sensu-backend)
     * [Basic Sensu agent](#basic-sensu-agent)
+    * [Manage Windows Agent](#manage-windows-agent)
     * [Advanced agent](#advanced-agent)
     * [Advanced SSL](#advanced-ssl)
     * [Enterprise support](#enterprise-support)
@@ -65,6 +66,8 @@ This module has a soft dependency on the [puppetlabs/apt](https://forge.puppet.c
 
 If using Puppet >= 6.0.0 there is a soft dependency on the [puppetlabs/yumrepo_core](https://forge.puppet.com/puppetlabs/yumrepo_core) module (`>= 1.0.1 < 2.0.0`) for systems using `yum`.
 
+If managing Windows there is a soft dependency on the [puppet/archive](https://forge.puppet.com/puppet/archive) module.
+
 ### Beginning with sensu
 
 This module provides Vagrant definitions that can be used to get started with Sensu.
@@ -117,6 +120,26 @@ associated to `linux` and `apache-servers` subscriptions.
       'subscriptions' => ['linux', 'apache-servers'],
     },
   }
+```
+
+### Manage Windows Agent
+
+The Windows package source must either be specified as a URL via `package_source_url` parameter or set to a filesystem location using `package_source` parameter.
+
+Install sensu-go-agent on Windows from URL:
+
+```puppet
+class { 'sensu::agent':
+  package_source_url => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.7.0/sensu-go-agent_5.7.0.2380_en-US.x64.msi',
+}
+```
+
+If a system already has the necessary MSI present it can be installed without downloading from an URL:
+
+```puppet
+class { 'sensu::agent':
+  package_source => 'C:\Temp\sensu-go-agent.msi',
+}
 ```
 
 ### Advanced agent

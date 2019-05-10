@@ -135,4 +135,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     agent.vm.provision :shell, :inline => "puppet apply /vagrant/tests/sensu-agent.pp"
     agent.vm.provision :shell, :inline => "facter --custom-dir=/vagrant/lib/facter sensu_agent"
   end
+
+  config.vm.define "win2012r2-agent", autostart: false do |agent|
+    agent.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+    agent.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    agent.vm.hostname = 'win2012r2-agent'
+    agent.vm.network  :private_network, ip: "192.168.52.24"
+    agent.vm.network "forwarded_port", host: 3389, guest: 3389, auto_correct: true
+    agent.vm.provision :shell, :path => "tests/provision_basic_win.ps1"
+    agent.vm.provision :shell, :inline => 'iex "puppet apply -v C:/vagrant/tests/sensu-agent.pp"'
+    agent.vm.provision :shell, :inline => "facter --custom-dir=C:\vagrant\lib\facter sensu_agent"
+  end
 end

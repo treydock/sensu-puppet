@@ -13,6 +13,13 @@
 # @param version
 #   Version of sensu agent to install.  Defaults to `installed` to support
 #   Windows MSI packaging and to avoid surprising upgrades.
+# @param package_source_url
+#   URL of package source for installing on Windows
+# @param package_source
+#   Alternative to package_source_url in order to install Windows package
+#   Use if the MSI installer already exists on local filesystem
+# @param package_download_path
+#   Where to download the MSI for Windows. Defaults to `C:`.
 # @param package_name
 #   Name of Sensu agent package.
 # @param service_name
@@ -30,9 +37,15 @@
 #   Passing `backend-url` as part of `config_hash` takes precedence.
 # @param show_diff
 #   Sets show_diff parameter for agent.yml configuration file
+# @param log_file
+#   Path to agent log file, only for Windows.
+#   Defaults to `C:\ProgramData\sensu\log\sensu-agent.log`
 #
 class sensu::agent (
   Optional[String] $version = undef,
+  Optional[Variant[Stdlib::HTTPSUrl,Stdlib::HTTPUrl]] $package_source_url = undef,
+  Optional[Stdlib::Absolutepath] $package_source = undef,
+  Optional[Stdlib::Absolutepath] $package_download_path = undef,
   String $package_name = 'sensu-go-agent',
   String $service_name = 'sensu-agent',
   String $service_ensure = 'running',
@@ -40,6 +53,7 @@ class sensu::agent (
   Hash $config_hash = {},
   Array[Sensu::Backend_URL] $backends = ['localhost:8081'],
   Boolean $show_diff = true,
+  Optional[Stdlib::Absolutepath] $log_file = undef,
 ) {
 
   include ::sensu
@@ -52,7 +66,7 @@ class sensu::agent (
   if $use_ssl {
     $backend_protocol = 'wss'
     $ssl_config = {
-      'trusted-ca-file' => "${ssl_dir}/ca.crt",
+      'trusted-ca-file' => $::sensu::trusted_ca_file_path,
     }
     $service_subscribe = Class['::sensu::ssl']
   } else {
@@ -71,18 +85,51 @@ class sensu::agent (
     'backend-url' => $backend_urls,
   }
   $config = $default_config + $ssl_config + $config_hash
+  $config_path = join([$etc_dir, 'agent.yml'], $::sensu::join_path)
+
+  if $facts['os']['family'] == 'windows' {
+    $sensu_agent_exe = "C:\\Program Files\\sensu\\sensu-agent\\bin\\sensu-agent.exe"
+    exec { 'install-agent-service':
+      command => "C:\\windows\\system32\\cmd.exe /c \"\"${sensu_agent_exe}\" service install --config-file \"${config_path}\" --log-file \"${log_file}\"\"",
+      unless  => "C:\\windows\\system32\\sc.exe query SensuAgent",
+      before  => Service['sensu-agent'],
+      require => [
+        Package['sensu-go-agent'],
+        File['sensu_agent_config'],
+      ],
+    }
+    if $package_source_url {
+      $package_source_basename = basename($package_source_url)
+      $_package_source = pick($package_source, "${package_download_path}\\${package_source_basename}")
+      archive { 'sensu-go-agent.msi':
+        source  => $package_source_url,
+        path    => $_package_source,
+        extract => false,
+        cleanup => false,
+        before  => Package['sensu-go-agent'],
+      }
+    } else {
+      $_package_source = $package_source
+    }
+  } else {
+    $_package_source = undef
+  }
 
   package { 'sensu-go-agent':
     ensure  => $_version,
     name    => $package_name,
+    source  => $_package_source,
     before  => File['sensu_etc_dir'],
     require => $::sensu::package_require,
   }
 
   file { 'sensu_agent_config':
     ensure    => 'file',
-    path      => "${etc_dir}/agent.yml",
+    path      => $config_path,
     content   => to_yaml($config),
+    owner     => $::sensu::sensu_user,
+    group     => $::sensu::sensu_group,
+    mode      => $::sensu::file_mode,
     show_diff => $show_diff,
     require   => Package['sensu-go-agent'],
     notify    => Service['sensu-agent'],
