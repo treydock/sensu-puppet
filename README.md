@@ -124,13 +124,21 @@ associated to `linux` and `apache-servers` subscriptions.
 
 ### Manage Windows Agent
 
-The Windows package source must either be specified as a URL via `package_source_url` parameter or set to a filesystem location using `package_source` parameter.
+The Windows package source must be specified as either a URL, a Puppet source or a filesystem path.
 
 Install sensu-go-agent on Windows from URL:
 
 ```puppet
 class { 'sensu::agent':
-  package_source_url => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.7.0/sensu-go-agent_5.7.0.2380_en-US.x64.msi',
+  package_source => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.7.0/sensu-go-agent_5.7.0.2380_en-US.x64.msi',
+}
+```
+
+Install sensu-ago-agent on Windows from Puppet source:
+
+```puppet
+class { 'sensu::agent':
+  package_source => 'puppet:///modules/profile/sensu/sensu-go-agent.msi',
 }
 ```
 

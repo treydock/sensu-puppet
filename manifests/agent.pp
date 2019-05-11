@@ -13,11 +13,10 @@
 # @param version
 #   Version of sensu agent to install.  Defaults to `installed` to support
 #   Windows MSI packaging and to avoid surprising upgrades.
-# @param package_source_url
-#   URL of package source for installing on Windows
 # @param package_source
-#   Alternative to package_source_url in order to install Windows package
-#   Use if the MSI installer already exists on local filesystem
+#   Source of package for installing Windows.
+#   Paths with http:// or https:// will be downloaded
+#   Paths with puppet:// or absolute filesystem paths will also be installed.
 # @param package_download_path
 #   Where to download the MSI for Windows. Defaults to `C:`.
 # @param package_name
@@ -43,8 +42,7 @@
 #
 class sensu::agent (
   Optional[String] $version = undef,
-  Optional[Variant[Stdlib::HTTPSUrl,Stdlib::HTTPUrl]] $package_source_url = undef,
-  Optional[Stdlib::Absolutepath] $package_source = undef,
+  Optional[String[1]] $package_source = undef,
   Optional[Stdlib::Absolutepath] $package_download_path = undef,
   String $package_name = 'sensu-go-agent',
   String $service_name = 'sensu-agent',
@@ -98,15 +96,24 @@ class sensu::agent (
         File['sensu_agent_config'],
       ],
     }
-    if $package_source_url {
-      $package_source_basename = basename($package_source_url)
-      $_package_source = pick($package_source, "${package_download_path}\\${package_source_basename}")
+    if $package_source and ($package_source =~ Stdlib::HTTPSUrl or $package_source =~ Stdlib::HTTPUrl) {
+      $package_source_basename = basename($package_source)
+      $_package_source = "${package_download_path}\\${package_source_basename}"
       archive { 'sensu-go-agent.msi':
-        source  => $package_source_url,
+        source  => $package_source,
         path    => $_package_source,
         extract => false,
         cleanup => false,
         before  => Package['sensu-go-agent'],
+      }
+    } elsif $package_source and $package_source =~ /^puppet:/ {
+      $package_source_basename = basename($package_source)
+      $_package_source = "${package_download_path}\\${package_source_basename}"
+      file { 'sensu-go-agent.msi':
+        ensure => 'file',
+        path   => $_package_source,
+        source => $package_source,
+        before => Package['sensu-go-agent'],
       }
     } else {
       $_package_source = $package_source

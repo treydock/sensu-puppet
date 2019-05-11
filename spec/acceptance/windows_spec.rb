@@ -5,9 +5,9 @@ describe 'sensu::agent class', if: Gem.win_platform? do
     pp = <<-EOS
     class { '::sensu': }
     class { '::sensu::agent':
-      package_source_url => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.7.0/sensu-go-agent_5.7.0.2380_en-US.x64.msi',
-      backends           => ['sensu_backend:8081'],
-      config_hash        => {
+      package_source => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.7.0/sensu-go-agent_5.7.0.2380_en-US.x64.msi',
+      backends       => ['sensu_backend:8081'],
+      config_hash    => {
         'name' => 'sensu_agent',
       }
     }

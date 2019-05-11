@@ -72,20 +72,50 @@ describe 'sensu::agent', :type => :class do
         }
       end
 
-      context 'when package_source_url defined' do
-        let(:params) {{ package_source_url: 'https://foo/sensu-go-agent.msi' }}
+      context 'when package_source defined as URL' do
+        let(:params) {{ package_source: 'https://foo/sensu-go-agent.msi' }}
         if facts[:os]['family'] == 'windows'
           it {
             should contain_archive('sensu-go-agent.msi').with({
               'source' => 'https://foo/sensu-go-agent.msi',
               'path'   => 'C:\\\\sensu-go-agent.msi',
-              'extract' => 'false',
-              'cleanup' => 'false',
-              'before'  => 'Package[sensu-go-agent]',
+              'extract'=> 'false',
+              'cleanup'=> 'false',
+              'before' => 'Package[sensu-go-agent]',
             })
           }
+          it { should contain_package('sensu-go-agent').with_source('C:\\\\sensu-go-agent.msi') }
         else
           it { should_not contain_archive('sensu-go-agent.msi') }
+          it { should contain_package('sensu-go-agent').without_source }
+        end
+      end
+
+      context 'when package_source defined as puppet' do
+        let(:params) {{ package_source: 'puppet:///modules/profile/sensu-go-agent.msi' }}
+        if facts[:os]['family'] == 'windows'
+          it {
+            should contain_file('sensu-go-agent.msi').with({
+              'ensure' => 'file',
+              'source' => 'puppet:///modules/profile/sensu-go-agent.msi',
+              'path'   => 'C:\\\\sensu-go-agent.msi',
+              'before' => 'Package[sensu-go-agent]',
+            })
+          }
+          it { should contain_package('sensu-go-agent').with_source('C:\\\\sensu-go-agent.msi') }
+        else
+          it { should_not contain_archive('sensu-go-agent.msi') }
+          it { should contain_package('sensu-go-agent').without_source }
+        end
+      end
+
+      context 'when package_source is local' do
+        let(:params) {{ package_source: 'C:\\sensu-go-agent.msi' }}
+        it { should_not contain_archive('sensu-go-agent.msi') }
+        if facts[:os]['family'] == 'windows'
+          it { should contain_package('sensu-go-agent').with_source('C:\\sensu-go-agent.msi') }
+        else
+          it { should contain_package('sensu-go-agent').without_source }
         end
       end
 
