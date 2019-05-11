@@ -27,12 +27,13 @@ install:
     cd $ENV:APPVEYOR_BUILD_FOLDER
 - ps: Copy-Item -Path $ENV:APPVEYOR_BUILD_FOLDER -Destination C:/ProgramData/PuppetLabs/code/environments/production/modules/sensu -Recurse
 - ps: Copy-Item -Path "${ENV:APPVEYOR_BUILD_FOLDER}/tests/ssl" -Destination C:/ProgramData/PuppetLabs/puppet/etc/ssl -Recurse
+- ps: Copy-Item -Path "${ENV:APPVEYOR_BUILD_FOLDER}/lib/facter" -Destination C:/ProgramData/PuppetLabs/puppet/cache/lib/facter -Recurse
 - set PATH=C:\Program Files\Puppet Labs\Puppet\bin;%PATH%
 - puppet --version
 - puppet module install puppetlabs-stdlib
 - puppet module install puppet-archive
 - puppet config set --section main certname sensu_agent
-- facter
+- facter -p --debug
 - ruby -v
 - gem update --system 2.7.9
 - gem -v

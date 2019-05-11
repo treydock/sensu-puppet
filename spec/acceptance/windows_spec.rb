@@ -24,5 +24,8 @@ describe 'sensu::agent class', if: Gem.win_platform? do
       it { should be_enabled }
       it { should be_running }
     end
+    describe command('facter -p sensu_agent.version') do
+      its(:stdout) { should match /^[0-9\.]+$/ }
+    end
   end
 end
