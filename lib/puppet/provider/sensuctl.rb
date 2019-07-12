@@ -99,7 +99,7 @@ class Puppet::Provider::Sensuctl < Puppet::Provider
     self.class.sensuctl_delete(*args)
   end
 
-  def self.sensuctl_set(command, name, property, value: nil, flags:  nil)
+  def self.sensuctl_set(command, name, property, value = nil, flags =  nil)
     args = [command]
     args << "set-" + property.gsub('_', '-')
     args << name
