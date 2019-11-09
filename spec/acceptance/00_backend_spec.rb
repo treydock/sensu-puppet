@@ -5,10 +5,11 @@ describe 'sensu::backend class', unless: RSpec.configuration.sensu_cluster do
   context 'default' do
     it 'should work without errors' do
       pp = <<-EOS
-      class { '::sensu': }
+      class { '::sensu':
+        password     => 'supersecret',
+        old_password => 'P@ssw0rd!',
+      }
       class { '::sensu::backend':
-        password                  => 'supersecret',
-        old_password              => 'P@ssw0rd!',
         include_default_resources => false,
       }
       EOS
@@ -38,10 +39,11 @@ describe 'sensu::backend class', unless: RSpec.configuration.sensu_cluster do
   context 'default resources' do
     it 'should work without errors' do
       pp = <<-EOS
-      class { '::sensu': }
+      class { '::sensu':
+        password     => 'supersecret',
+        old_password => 'P@ssw0rd!',
+      }
       class { '::sensu::backend':
-        password                  => 'supersecret',
-        old_password              => 'P@ssw0rd!',
         include_default_resources => true,
       }
       EOS
@@ -62,11 +64,11 @@ describe 'sensu::backend class', unless: RSpec.configuration.sensu_cluster do
   context 'backend and agent' do
     it 'should work without errors' do
       pp = <<-EOS
-      class { '::sensu': }
-      class { '::sensu::backend':
+      class { '::sensu':
         password     => 'supersecret',
         old_password => 'P@ssw0rd!',
       }
+      class { '::sensu::backend': }
       class { '::sensu::agent':
         backends => ['sensu_backend:8081'],
       }
@@ -98,9 +100,11 @@ describe 'sensu::backend class', unless: RSpec.configuration.sensu_cluster do
   context 'reset admin password and opt-out tessen' do
     it 'should work without errors' do
       pp = <<-EOS
-      class { '::sensu::backend':
+      class { '::sensu':
         password      => 'P@ssw0rd!',
         old_password  => 'supersecret',
+      }
+      class { '::sensu::backend':
         tessen_ensure => 'absent',
       }
       EOS
