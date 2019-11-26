@@ -24,10 +24,6 @@
 #   The SSL certificate source
 # @param ssl_key_source
 #   The SSL private key source
-# @param agent_password
-#   The sensu agent password
-# @param agent_old_password
-#   The sensu agent old password needed when changing agent_password
 # @param include_default_resources
 #   Sets if default sensu resources should be included
 # @param show_diff
@@ -119,8 +115,6 @@ class sensu::backend (
   Hash $config_hash = {},
   Optional[String] $ssl_cert_source = $facts['puppet_hostcert'],
   Optional[String] $ssl_key_source = $facts['puppet_hostprivkey'],
-  String $agent_password = 'P@ssw0rd!',
-  Optional[String] $agent_old_password = undef,
   Boolean $include_default_resources = true,
   Boolean $show_diff = true,
   Optional[String] $license_source = undef,
@@ -233,6 +227,14 @@ class sensu::backend (
     disabled      => false,
     configure     => true,
     configure_url => $api_url,
+  }
+
+  sensu_user { 'agent':
+    ensure       => 'present',
+    disabled     => false,
+    password     => $::sensu::agent_password,
+    old_password => $::sensu::agent_old_password,
+    groups       => ['system:agents'],
   }
 
   if $license_source or $license_content {

@@ -84,6 +84,7 @@ class sensu::agent (
   }
   $default_config = {
     'backend-url' => $backend_urls,
+    'password'    => $::sensu::agent_password,
   }
   $config = $default_config + $ssl_config + $config_hash
 
