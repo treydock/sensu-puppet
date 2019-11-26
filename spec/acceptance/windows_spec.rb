@@ -7,8 +7,9 @@ describe 'sensu::agent class', if: Gem.win_platform? do
     class { '::sensu': }
     class { '::sensu::agent':
       backends       => ['sensu_backend:8081'],
+      entity_name    => 'sensu_agent',
       config_hash    => {
-        'name' => 'sensu_agent',
+        'log-level' => 'info',
       }
     }
     EOS
@@ -45,8 +46,9 @@ describe 'sensu::agent class', if: Gem.win_platform? do
       package_name   => 'Sensu Agent',
       package_source => 'https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/5.13.1/sensu-go-agent_5.13.1.5957_en-US.x64.msi',
       backends       => ['sensu_backend:8081'],
+      entity_name    => 'sensu_agent',
       config_hash    => {
-        'name' => 'sensu_agent',
+        'log-level' => 'info',
       }
     }
     EOS
