@@ -185,10 +185,8 @@ associated to `linux` and `apache-servers` subscriptions.
 
 ```puppet
   class { 'sensu::agent':
-    backends    => ['sensu-backend.example.com:8081'],
-    config_hash => {
-      'subscriptions' => ['linux', 'apache-servers'],
-    },
+    backends      => ['sensu-backend.example.com:8081'],
+    subscriptions => ['linux', 'apache-servers'],
   }
 ```
 
@@ -224,10 +222,8 @@ This module supports Windows Sensu Go agent via chocolatey beginning with versio
 
 ```puppet
 class { 'sensu::agent':
-  backends    => ['sensu-backend.example.com:8081'],
-  config_hash => {
-    'subscriptions' => ['windows'],
-  },
+  backends      => ['sensu-backend.example.com:8081'],
+  subscriptions => ['windows'],
 }
 ```
 
@@ -300,10 +296,8 @@ class { 'sensu':
   ssl_ca_source => 'puppet:///modules/profile/sensu/ca.pem',
 }
 class { 'sensu::agent':
-  backends    => ['sensu-backend.example.com:8081'],
-  config_hash => {
-    'subscriptions' => ['linux', 'apache-servers'],
-  },
+  backends      => ['sensu-backend.example.com:8081'],
+  subscriptions => ['linux', 'apache-servers'],
 }
 ```
 
@@ -368,10 +362,8 @@ Example installing plugins on agent:
 
 ```puppet
   class { 'sensu::agent':
-    backends    => ['sensu-backend.example.com:8081'],
-    config_hash => {
-      'subscriptions' => ['linux', 'apache-servers'],
-    },
+    backends      => ['sensu-backend.example.com:8081'],
+    subscriptions => ['linux', 'apache-servers'],
   }
   class { 'sensu::plugins':
     plugins => ['disk-checks'],
@@ -382,10 +374,8 @@ The `plugins` parameter can also be a Hash that sets the version:
 
 ```puppet
   class { 'sensu::agent':
-    backends    => ['sensu-backend.example.com:8081'],
-    config_hash => {
-      'subscriptions' => ['linux', 'apache-servers'],
-    },
+    backends      => ['sensu-backend.example.com:8081'],
+    subscriptions => ['linux', 'apache-servers'],
   }
   class { 'sensu::plugins':
     plugins => {
@@ -415,10 +405,8 @@ You can uninstall plugins by passing `ensure` as `absent`.
 
 ```puppet
   class { 'sensu::agent':
-    backends    => ['sensu-backend.example.com:8081'],
-    config_hash => {
-      'subscriptions' => ['linux', 'apache-servers'],
-    },
+    backends      => ['sensu-backend.example.com:8081'],
+    subscriptions => ['linux', 'apache-servers'],
   }
   class { 'sensu::plugins':
     plugins => {

@@ -8,8 +8,9 @@ describe 'sensu::agent class', unless: RSpec.configuration.sensu_cluster do
       class { '::sensu': }
       class { '::sensu::agent':
         backends    => ['sensu_backend:8081'],
+        entity_name => 'sensu_agent',
         config_hash => {
-          'name' => 'sensu_agent',
+          'log-level' => 'info',
         }
       }
       EOS
