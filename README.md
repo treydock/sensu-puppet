@@ -685,12 +685,12 @@ First configure backend Etcd to listen on an interface besides localhost and als
 ```puppet
 class { 'sensu::backend':
   config_hash => {
-    'etcd-listen-client-urls' => "https://0.0.0.0:2379",
+    'etcd-listen-client-urls'    => "https://0.0.0.0:2379",
     'etcd-advertise-client-urls' => "https://0.0.0.0:2379",
-    'etcd-cert-file' => "/etc/sensu/etcd-ssl/${facts['fqdn'].pem",
-    'etcd-key-file' => "/etc/sensu/etcd-ssl/${facts['fqdn']}-key.pem",
-    'etcd-trusted-ca-file' => "/etc/sensu/etcd-ssl/ca.pem",
-    'etcd-client-cert-auth' => true,
+    'etcd-cert-file'             => "/etc/sensu/etcd-ssl/${facts['fqdn'].pem",
+    'etcd-key-file'              => "/etc/sensu/etcd-ssl/${facts['fqdn']}-key.pem",
+    'etcd-trusted-ca-file'       => "/etc/sensu/etcd-ssl/ca.pem",
+    'etcd-client-cert-auth'      => true,
   },
 }
 ```
