@@ -46,11 +46,13 @@ describe 'sensu::agent class', if: Gem.win_platform? do
     class { 'sensu::agent':
       backends         => ['sensu_backend:8081'],
       entity_name      => 'sensu_agent',
+      subscriptions    => ['base'],
       service_env_vars => { 'SENSU_API_PORT' => '4041' },
       config_hash      => {
         'log-level' => 'info',
       }
     }
+    sensu::agent::subscription { 'windows': }
     EOS
 
     unless RSpec.configuration.skip_apply
@@ -65,6 +67,17 @@ describe 'sensu::agent class', if: Gem.win_platform? do
       end
     end
 
+    describe file('C:\ProgramData\Sensu\config\agent.yml') do
+      expected_content = {
+        'backend-url'     => ['wss://sensu_backend:8081'],
+        'password'        => 'P@ssw0rd!',
+        'name'            => 'sensu_agent',
+        'subscriptions'   => ['base','windows'],
+        'log-level'       => 'info',
+        'trusted-ca-file' => 'C:\ProgramData\Sensu\config\ssl\ca.crt',
+      }
+      its(:content_as_yaml) { is_expected.to eq(expected_content) }
+    end
     describe service('SensuAgent') do
       it { should be_enabled }
       it { should be_running }
